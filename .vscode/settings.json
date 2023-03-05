@@ -1,5 +1,6 @@
 {
     "cSpell.ignoreWords": [
+        "moralis",
         "nomiclabs"
     ],
     "solidity.defaultCompiler": "localFile"
