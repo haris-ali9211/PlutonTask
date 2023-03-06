@@ -27,13 +27,24 @@ router.post("/transfer", async (req, res) => {
 })
 
 router.get("/getAllTransfer", async (req, res) => {
-    console.log("🚀 ~ file: transferRoute.js:33 ~ router.get ~ req.body.to:", req.body)
+    let param = req.query.foo
   try {
-    const data = await transferModel.find({ to: `${req.body.to}` });
+    const data = await transferModel.find({ to: `${param}` });
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json(error);
   }
 });
+
+
+router.get("/getAlL", async (req, res) => {
+  try {
+    const data = await transferModel.find();
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 
 module.exports = router;

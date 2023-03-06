@@ -97,6 +97,7 @@ export default function Balance() {
             message: "You have successfully bought the tokens",
             position: "topR"
         })
+        postSuccessReq()
         setTimeout(() => window.location.reload(), 5000)
     }
 
@@ -107,32 +108,67 @@ export default function Balance() {
             message: "Buying canceled - you have rejected the transaction",
             position: "topR"
         })
+        postFailedReq();
     }
+
+    const postFailedReq = async () => {
+        let obj = {
+            to: "0xc1d30987c6fb125e186e525a06fc29c2f57efe2b",
+            from: "0x41D4fd77481072A025A7022137a59760b79f45Ee",
+            amount: 1,
+            status: "Failed"
+        };
+        try {
+            const _data = await axios.post(
+                "http://localhost:5000/api/transferRoute/transfer",
+                obj
+            );
+            console.log("Register response==>", _data.data);
+        }
+        catch (error) {
+            console.log("🚀", error)
+        }
+    };
+
+    const postSuccessReq = async () => {
+        let obj = {
+            to: "0xc1d30987c6fb125e186e525a06fc29c2f57efe2b",
+            from: "0x41D4fd77481072A025A7022137a59760b79f45Ee",
+            amount: 1,
+            status: "Success"
+        };
+        try {
+            const _data = await axios.post(
+                "http://localhost:5000/api/transferRoute/transfer",
+                obj
+            );
+            console.log("Register response==>", _data.data);
+        }
+        catch (error) {
+            console.log("🚀", error)
+        }
+    };
+
 
 
     const [Data, setData] = useState([]);
     const [error, setError] = useState(false);
 
 
-   
+
     const getData = async () => {
-
-
-        let data = {
-            to: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
-          };
-
-        const to = "0x41D4fd77481072A025A7022137a59760b79f45Ee"
-        // const account02 = "0x41D4fd77481072A025A7022137a59760b79f45Ee"
-        
         try {
             const databaseData = await axios.get(
-                `http://localhost:5000/api/transferRoute/getAllTransfer`,{
+                `http://localhost:5000/api/transferRoute/getAllTransfer/`,
+                {
                     params: {
-                      foo: 'bar'
-                    }}
+                        foo: accountAddress
+                    }
+                }
+
             );
             console.log("previous data==>", databaseData.data);
+            setData(databaseData.data)
             setError(false);
         } catch (error) {
             console.log("error", error);
@@ -140,9 +176,18 @@ export default function Balance() {
         }
     }
 
-    useEffect(() => {    
-        getData()   
-      }, []);
+    const getAccount = async () => {
+        setAccountAddress(account)
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            await getAccount()
+            await getData()
+        }
+        fetchData()
+
+    }, [account === accountAddress]);
 
     return (
         <>
@@ -160,6 +205,39 @@ export default function Balance() {
             }
             {/* <input type="text" value='amount' /> */}
             <button onClick={transfer}>Send token</button>
+
+
+            <div className="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Created At</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            Data? Data.map((obj,key) => {
+                                return (
+                                    <tr key={key}>
+                                        <td>{obj.amount}</td>
+                                        <td>{obj.createdAt}</td>
+                                        <td>{obj.from}</td>
+                                        <td>{obj.to}</td>
+                                        <td>{obj.status}</td>
+                                    </tr>
+                                )
+                            })
+                            : 
+                            null
+                        }
+                    </tbody>
+                </table>
+
+            </div>
         </>
     )
 }

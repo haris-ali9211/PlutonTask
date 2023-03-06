@@ -36,3 +36,43 @@
     transform: rotate(360deg);
   }
 }
+
+.table{
+  width: 80%
+}
+
+table {
+  font-family: Arial, sans-serif;
+  border-collapse: collapse;
+  width: 80%;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+tbody td:first-child {
+  font-weight: bold;
+}
+
+tbody td:last-child {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  td, th {
+    font-size: 14px;
+  }
+}
+
