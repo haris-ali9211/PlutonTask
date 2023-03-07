@@ -170,27 +170,26 @@ export default function Balance() {
 
 
     const getData = async () => {
-        if (account) {
-          try {
+
+        let acc = await account
+        try {
             const databaseData = await axios.get(
-              `http://localhost:5000/api/transferRoute/getAllTransfer/`,
-              {
-                params: {
-                  to: account
+                `http://localhost:5000/api/transferRoute/getAllTransfer/`,
+                {
+                    params: {
+                        foo: acc
+                    }
                 }
-              }
+
             );
             console.log("previous data==>", databaseData.data);
-            setData(databaseData.data);
-            setLoadingloadingAxio(false);
+            setData(databaseData.data)
             setError(false);
-          } catch (error) {
+        } catch (error) {
             console.log("error", error);
-            setLoadingloadingAxio(false);
             setError(true);
-          }
         }
-      }
+    }
 
     const getAccount = async () => {
         setAccountAddress(account)
@@ -198,12 +197,13 @@ export default function Balance() {
 
     useEffect(() => {
             async function fetchData() {
-                 getData()
-                 setLoadingloadingAxio(true);
+                if(account){
+                    getData()
+                }
             }
             fetchData()
 
-    }, [account]);
+    }, [account === accountAddress && account]);
 
     useEffect(() => {
         async function fetchData() {
@@ -266,6 +266,7 @@ export default function Balance() {
                             : 
                             null
                         }
+                        {Data >=0 ? <p>No transaction </p> : null}
                     </tbody>
                 </table>
 
