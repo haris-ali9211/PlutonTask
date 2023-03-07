@@ -65,19 +65,24 @@ export default function Balance() {
 
     }, [chainId, isWeb3Enabled])
 
-
+    const [add, setAddress] = useState("")
+    const [amut, setAmount] = useState("")
+    
+    
     const transfer = async (e) => {
         e.preventDefault()
-        const value = 1;
+        
+        console.log("🚀 ~ file: balance.jsx:70 ~ Balance ~ amut:", amut,add)
+        
+        const value = amut;
         const Price = ethers.utils.parseUnits(value.toString(), "ether")?.toString()
-        const senderAccount = "0x41D4fd77481072A025A7022137a59760b79f45Ee"
 
         const options = {
             abi: abi,
             contractAddress: tokenAddress,
             functionName: 'transfer',
             params: {
-                to: senderAccount,
+                to: add,
                 amount: Price
             }
         }
@@ -113,9 +118,9 @@ export default function Balance() {
 
     const postFailedReq = async () => {
         let obj = {
-            to: "0xc1d30987c6fb125e186e525a06fc29c2f57efe2b",
-            from: "0x41D4fd77481072A025A7022137a59760b79f45Ee",
-            amount: 1,
+            to: add,
+            from: account,
+            amount: amut,
             status: "Failed"
         };
         try {
@@ -124,6 +129,8 @@ export default function Balance() {
                 obj
             );
             console.log("Register response==>", _data.data);
+            setAmount("")
+            setAddress("")
         }
         catch (error) {
             console.log("🚀", error)
@@ -132,9 +139,9 @@ export default function Balance() {
 
     const postSuccessReq = async () => {
         let obj = {
-            to: "0xc1d30987c6fb125e186e525a06fc29c2f57efe2b",
-            from: "0x41D4fd77481072A025A7022137a59760b79f45Ee",
-            amount: 1,
+            to: add,
+            from: account,
+            amount: amut,
             status: "Success"
         };
         try {
@@ -143,6 +150,8 @@ export default function Balance() {
                 obj
             );
             console.log("Register response==>", _data.data);
+            setAmount("")
+            setAddress("")
         }
         catch (error) {
             console.log("🚀", error)
@@ -155,40 +164,56 @@ export default function Balance() {
     const [error, setError] = useState(false);
 
 
+    const [loadingAxio, setLoadingloadingAxio] = useState(true);
+
+
+
 
     const getData = async () => {
-        try {
+        if (account) {
+          try {
             const databaseData = await axios.get(
-                `http://localhost:5000/api/transferRoute/getAllTransfer/`,
-                {
-                    params: {
-                        foo: accountAddress
-                    }
+              `http://localhost:5000/api/transferRoute/getAllTransfer/`,
+              {
+                params: {
+                  to: account
                 }
-
+              }
             );
             console.log("previous data==>", databaseData.data);
-            setData(databaseData.data)
+            setData(databaseData.data);
+            setLoadingloadingAxio(false);
             setError(false);
-        } catch (error) {
+          } catch (error) {
             console.log("error", error);
+            setLoadingloadingAxio(false);
             setError(true);
+          }
         }
-    }
+      }
 
     const getAccount = async () => {
         setAccountAddress(account)
     }
 
     useEffect(() => {
+            async function fetchData() {
+                 getData()
+                 setLoadingloadingAxio(true);
+            }
+            fetchData()
+
+    }, [account]);
+
+    useEffect(() => {
         async function fetchData() {
-            await getAccount()
-            await getData()
+            getAccount()
         }
         fetchData()
 
-    }, [account === accountAddress]);
+}, [account]);
 
+   
     return (
         <>
             {
@@ -203,7 +228,14 @@ export default function Balance() {
                     :
                     <p>loading</p>
             }
-            {/* <input type="text" value='amount' /> */}
+
+            <input  type="amount" name="amount" placeholder="amount" required
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <input type="address" name="address" placeholder="address" required
+              onChange={(e) => setAddress(e.target.value)}
+            />
+
             <button onClick={transfer}>Send token</button>
 
 
